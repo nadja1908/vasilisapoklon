@@ -5,8 +5,13 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write
+  contents: read
   pages: write
+  id-token: write
+
+environment:
+  name: github-pages
+  url: ${{ steps.deployment.outputs.page_url }}
 
 jobs:
   deploy:
@@ -14,28 +19,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       
-      - name: Deploy to gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Try to checkout gh-pages, if it doesn't exist create it
-          if git show-ref --quiet refs/remotes/origin/gh-pages; then
-            git checkout gh-pages
-            git pull origin gh-pages
-          else
-            git checkout --orphan gh-pages
-            git rm -rf .
-            git config --local index.version 4
-          fi
-          
-          # Copy content from main
-          git checkout main -- .
-          git add -A .
-          git diff-index --quiet HEAD || git commit -m "Publish from main branch"
-          git push -q https://x-access-token:${GITHUB_TOKEN}@github.com/nadja1908/vasilisapoklon.git gh-pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './docs'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
