@@ -134,6 +134,8 @@
     object-position:center bottom;
     filter:drop-shadow(0 16px 24px rgba(0,0,0,.20));
     pointer-events:none;
+    will-change: transform, opacity;
+    animation: riseOut 1s cubic-bezier(.18,.9,.22,1) both;
   }
 
   .g1{
@@ -162,6 +164,26 @@
     bottom:0;
     height:470px;
     z-index:6;
+  }
+
+  .g1 { animation-delay: 0.05s; }
+  .g2 { animation-delay: 0.18s; }
+  .g3 { animation-delay: 0.3s; }
+  .g4 { animation-delay: 0.42s; }
+
+  @keyframes riseOut {
+    0% {
+      opacity: 0;
+      transform: translateY(34px) scale(0.88);
+    }
+    70% {
+      opacity: 1;
+      transform: translateY(-8px) scale(1.02);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
     .balloon {
       position: absolute;
