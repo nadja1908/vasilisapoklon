@@ -8,11 +8,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v3
+      - uses: actions/checkout@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: '.'
+          fetch-depth: 0
+      
+      - name: Deploy to gh-pages
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create gh-pages branch if it doesn't exist
+          if git rev-parse --verify gh-pages >/dev/null 2>&1; then
+            git checkout gh-pages
+            git rm -rf .
+          else
+            git checkout --orphan gh-pages
+          fi
+          
+          # Copy files from main
+          git checkout main -- .
+          git add -A
+          git commit -m "Deploy from main branch" || echo "No changes to commit"
+          git push origin gh-pages -f
